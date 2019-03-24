@@ -27,7 +27,10 @@ import javax.comm.UnsupportedCommOperationException;
     private String id="";
     private double t=0;
     private double l=0;
-    private String rfid;
+    private String id_b="";
+    private double t_b=0;
+    private double l_b=0;
+    private String rfid="";
     static CommPortIdentifier portId;
     static Enumeration portList;
     InputStream inputStream;
@@ -77,6 +80,31 @@ import javax.comm.UnsupportedCommOperationException;
     public void setRfid(String rfid) {
         this.rfid = rfid;
     }
+
+    public String getId_b() {
+        return id_b;
+    }
+
+    public void setId_b(String id_b) {
+        this.id_b = id_b;
+    }
+
+    public double getT_b() {
+        return t_b;
+    }
+
+    public void setT_b(double t_b) {
+        this.t_b = t_b;
+    }
+
+    public double getL_b() {
+        return l_b;
+    }
+
+    public void setL_b(double l_b) {
+        this.l_b = l_b;
+    }
+    
     
     
 
@@ -89,12 +117,16 @@ public static String[] getPort(){
         String[] r = new String[5];
             
         while (portEnum.hasMoreElements() && i < 5) {
+            if(i==0){
+                 r[i] ="choix ...";
+                 i++;
+            }else{
             CommPortIdentifier portIdentifier = portEnum.nextElement();
 
             r[i] = portIdentifier.getName();//+  " - " +  getPortTypeName(portIdentifier.getPortType()) ;
 
              
-            i++;
+            i++;}
 
 
         }  return r;
@@ -203,15 +235,15 @@ public static String[] getPort(){
                     String id=data[0];
                    double t=Double.parseDouble(data[1]);
                    double l=Double.parseDouble(data[2]);
-                   
-                    String rfid=data[3];
-                    
-                   // System.out.println("id: "+id);
-                   // System.out.println("T: "+t);
-                   // System.out.println("L: "+l);
-                   // System.out.println("RFID: "+rfid);
-                    
-                    
+                   String rfid=data[3];
+                    this.id_b=id;
+                    this.l_b=l;
+                    this.t_b=t;
+                    this.rfid=rfid;
+                    System.out.println("id: "+id);
+                    System.out.println("T: "+t);
+                    System.out.println("L: "+l);
+                    System.out.println("RFID: "+rfid);
                     
                     
                    

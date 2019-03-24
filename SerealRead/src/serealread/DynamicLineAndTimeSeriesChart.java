@@ -10,8 +10,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.SQLException;
 import java.util.Enumeration;
 import java.util.TooManyListenersException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.comm.CommPortIdentifier;
 import javax.comm.PortInUseException;
 import javax.comm.SerialPort;
@@ -19,6 +22,8 @@ import javax.comm.SerialPortEvent;
 import javax.comm.SerialPortEventListener;
 import javax.comm.UnsupportedCommOperationException;
 import javax.swing.BoxLayout;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
 import javax.swing.Timer;
 import javax.swing.JPanel;
@@ -41,7 +46,8 @@ import org.jfree.ui.RefineryUtilities;
 public class DynamicLineAndTimeSeriesChart extends ApplicationFrame implements ActionListener {
 
     private TimeSeries series,series2,series3,series4;
-    private Donnees donnees;
+    private Donnees donnees= new Donnees();
+    private Database database = new Database();
 
   
    
@@ -57,6 +63,8 @@ public class DynamicLineAndTimeSeriesChart extends ApplicationFrame implements A
     public DynamicLineAndTimeSeriesChart(final String title,String com) {
 
         super(title);
+        
+        
         donnees = new Donnees();
         donnees.SimpleRead(com);
         this.series = new TimeSeries("Température", Millisecond.class);
@@ -121,7 +129,6 @@ public class DynamicLineAndTimeSeriesChart extends ApplicationFrame implements A
             true,
             false
         );
-
         final XYPlot plot = result.getXYPlot();
 
         plot.setBackgroundPaint(new Color(0xffffe0));
@@ -149,12 +156,40 @@ public class DynamicLineAndTimeSeriesChart extends ApplicationFrame implements A
      * @param e  the action event.
      */
     public void actionPerformed(final ActionEvent e) {
+    JOptionPane jop1;
 
-
-
-       final Millisecond now = new Millisecond();
-       
-           
+       if(!donnees.getRfid().equals("")){
+            
+        try {
+            String username ="";
+            username=database.getUsernameByRfid(donnees.getRfid());
+            if(!username.equals("")){
+                    final Millisecond now = new Millisecond();
+                    String time =""+now;
+                    boolean ok =database.addDonnees(time, ""+donnees.getL_b(), ""+donnees.getT_b(), donnees.getRfid(), donnees.getId_b());
+            if(ok){
+               jop1 = new JOptionPane();
+               jop1.showMessageDialog(null, "Sauvegarde faite par  : "+username, "Sauvegarde !", JOptionPane.INFORMATION_MESSAGE);
+            
+            }else{
+                System.out.println("erreur de sauvegarde ");
+            }
+                    
+                    
+             }else{
+            
+                System.out.println("utilisateur introuvable !!");
+            }
+            
+            
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(DynamicLineAndTimeSeriesChart.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(DynamicLineAndTimeSeriesChart.class.getName()).log(Level.SEVERE, null, ex);
+        }
+       donnees.setRfid("");
+       }
+      
        if(donnees.getId().equals("1")){
         this.series.add(new Millisecond(), donnees.getT());
         this.series2.add(new Millisecond(), 0.1*donnees.getL());
